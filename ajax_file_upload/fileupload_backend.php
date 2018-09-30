@@ -57,6 +57,7 @@
                     }
 
                     // move file from tmpdir and save
+		    // TODO: check user permissions
                     move_uploaded_file($_FILES[FILE_NAME_ATTR]['tmp_name'],
                                        $filesKeys['saved_image_absolute_path']);
 

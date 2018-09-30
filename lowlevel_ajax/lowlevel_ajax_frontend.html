@@ -1,0 +1,123 @@
+<!doctype html>
+
+<html>
+
+    <head>
+        <title>Lowlevel Ajax Test</title>
+        <meta charset="utf-8">
+    </head>
+
+    <body>
+        <h1>Lowlevel Ajax Test</h1>
+
+        <button type="button" id="action-btn-array">Get array Ajax data</button>
+        <button type="button" id="action-btn-object">Get object Ajax data</button>
+        <br>
+
+        <table>
+            <tr>
+                <td>
+                    <ul id="data-array-target">
+                    </ul>
+                </td>
+                <td>
+                    <ul id="data-object-target">
+                    </ul>
+                </td>
+            </tr>
+        </table>
+
+
+
+
+        <script src="lowlevel_ajax.js"></script>
+        <script>
+            (function() {
+
+                var ajaxData = {};
+                var dataKey = 'row_data';
+
+
+                function populateListFromArray(dataArray)
+                {
+                    var list = document.getElementById('data-array-target');
+                    var i;
+
+                    for(i=0; i<dataArray.length; ++i) {
+                        var liElement = document.createElement('li');
+                        var textNode = document.createTextNode(dataArray[i]);
+                        liElement.appendChild(textNode);
+                        list.appendChild(liElement);
+                    }
+                }
+
+
+                function populateListFromObject(dataObject)
+                {
+                    var list = document.getElementById('data-object-target');
+                    var i;
+
+                    for(prop in dataObject) {
+                        if (dataObject.hasOwnProperty(prop)) {
+                            var liElement = document.createElement('li');
+                            var textNode = document.createTextNode(prop + " => " + dataObject[prop]);
+                            liElement.appendChild(textNode);
+                            list.appendChild(liElement);
+                        }
+                    }
+                }
+
+
+                /*
+                 * On ajax server response HTML DOM action function
+                 * Demonstrates HTML presentation of received ajax array data.
+                 */
+                function populateList(type)
+                {
+                    // expects global HTTP_REQUEST variable
+                	var response = getAjaxResponse();
+
+                	if (response !== 0) {
+
+                        // already json-parsed in getAjaxResponse()
+                		// var response = JSON.parse(HTTP_REQUEST.responseText);
+                        console.log(response);
+
+                		if (response.length > 0 || Object.getOwnPropertyNames(response).length > 0) {
+
+                            if(type === 'array') {
+                                populateListFromArray(response);
+                            }
+                            else if(type === 'object') {
+                                console.log('type object');
+                                populateListFromObject(response);
+                            }
+                            else {
+                                console.log('populateList() invalid `type` argument');
+                            }
+                		}
+                		else {
+                			// no response data, no action
+                		}
+                	}
+                }
+
+                document.getElementById('action-btn-array')
+                        .addEventListener('click', function() {
+
+                            callAjax('lowlevel_ajax_backend.php', 'array', 'string',
+                                     populateList, 'array', true);
+                });
+
+                document.getElementById('action-btn-object')
+                        .addEventListener('click', function() {
+
+                            callAjax('lowlevel_ajax_backend.php', 'object', 'string',
+                                     populateList, 'object', true);
+                });
+
+            })();
+        </script>
+    </body>
+
+</html>
